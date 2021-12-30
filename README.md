@@ -31,4 +31,4 @@ docker run --rm -it -p8080:8080 -v $(pwd):/data/project ghcr.io/shyim/qodana-php
 
 ## Configuration
 
-The default configuration does not check much. It is recommanded to create a custom inspection profile to do much as possible. See example folder for a base files
+The default configuration does not check much. It is recommanded to create a custom inspection profile to do much more as possible. See example folder for a base files
