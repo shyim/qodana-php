@@ -12,13 +12,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
     - name: Login into Github Docker Registery
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Build the Docker image
-      run: docker build -t ghcr.io/shyim/qodana-php .
-      
-    - name: Push image
-      run: docker push ghcr.io/shyim/qodana-php
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/shyim/qodana-php
+        cache-from: type=gha,mode=max
+        cache-to: type=tha,mode=max
