@@ -8,9 +8,11 @@ on:
     - cron: '0 2 * * *'
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ["8.0", "8.1", "8.2"]
     steps:
     - uses: actions/checkout@v3
     
@@ -25,6 +27,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/shyim/qodana-php
+        file: "Dockerfile.${{ matrix.php }}"
+        tags: ghcr.io/shyim/qodana-php:${{ matrix.php }}
         cache-from: type=gha,mode=max
         cache-to: type=gha,mode=max

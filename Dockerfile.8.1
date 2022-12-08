@@ -1,0 +1,7 @@
+FROM jetbrains/qodana-php:2022.3-eap
+
+COPY rootfs/ /
+
+RUN apt-get update && apt-get purge php* -y && apt-get install -y php8.1-cli php8.1-mysql php8.1-curl php8.1-gd php8.1-xml php8.1-zip php8.1-opcache php8.1-mbstring php8.1-intl php8.1-imap php8.1-pgsql php8.1-soap && composer selfupdate
+
+ENTRYPOINT ["/entrypoint.sh"]
