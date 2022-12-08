@@ -14,4 +14,4 @@ if [[ ! -f "$ideaDir/workspace.xml" ]]; then
   cp /opt/php-cfg/.idea/workspace.xml "$ideaDir/workspace.xml"
 fi
 
-exec /opt/idea/bin/entrypoint "$@"
+exec /opt/idea/bin/qodana "$@"
