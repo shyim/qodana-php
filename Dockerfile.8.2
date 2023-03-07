@@ -24,6 +24,7 @@ RUN apt-get update && \
     update-alternatives --set java $JAVA_HOME/bin/java && \
     update-alternatives --set javac $JAVA_HOME/bin/javac && \
     mkdir -p /root/.config/idea && \
+    mkdir -p /data/project && \
     chmod 777 -R /root && \
     chmod 777 -R /data
 
