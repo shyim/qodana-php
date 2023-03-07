@@ -26,7 +26,8 @@ RUN apt-get update && \
     mkdir -p /root/.config/idea && \
     mkdir -p /data/project && \
     chmod 777 -R /root && \
-    chmod 777 -R /data
+    chmod 777 -R /data && \
+    chmod 666 /etc/passwd
 
 COPY rootfs/ /
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
