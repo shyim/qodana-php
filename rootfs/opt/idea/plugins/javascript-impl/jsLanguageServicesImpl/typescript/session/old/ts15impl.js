@@ -1,8 +1,9 @@
 "use strict";
 exports.__esModule = true;
+exports.updateConfiguredProject15 = exports.findConfiguredProjectByConfigFile15 = exports.setGetFileNames = exports.openProjectByConfig = exports.openClientFileConfig15 = exports.onMessage15 = exports.close15 = exports.reload15 = void 0;
 var logger_impl_1 = require("../../logger-impl");
 function reload15(session, ts_impl) {
-    logger_impl_1.serverLogger("Start reload");
+    (0, logger_impl_1.serverLogger)("Start reload");
     var service = session.projectService;
     for (var _i = 0, _a = service.configuredProjects; _i < _a.length; _i++) {
         var project = _a[_i];
@@ -32,7 +33,7 @@ function onMessage15(session, message) {
         return response;
     }
     catch (e) {
-        logger_impl_1.serverLogger(e, true);
+        (0, logger_impl_1.serverLogger)(e, true);
         throw e;
     }
 }
@@ -59,7 +60,7 @@ function openProjectByConfig(service, fileName, ts_impl) {
         else {
             var configResult = service.openConfigFile(configFileName, fileName);
             if (!configResult.success) {
-                logger_impl_1.serverLogger("Error opening config file " + configFileName + " " + configResult.errorMsg, true);
+                (0, logger_impl_1.serverLogger)("Error opening config file " + configFileName + " " + configResult.errorMsg, true);
             }
             else {
                 service.configuredProjects.push(configResult.project);
@@ -111,14 +112,14 @@ function findConfiguredProjectByConfigFile15(service, configFileName) {
 }
 exports.findConfiguredProjectByConfigFile15 = findConfiguredProjectByConfigFile15;
 function updateConfiguredProject15(service, project, ts_impl) {
-    logger_impl_1.serverLogger("Update project", true);
+    (0, logger_impl_1.serverLogger)("Update project", true);
     if (!service.host.fileExists(project.projectFilename)) {
         service.removeProject(project);
     }
     else {
         var rawConfig = ts_impl.readConfigFile(project.projectFilename);
         var projectOptions = rawConfig.config;
-        logger_impl_1.serverLogger("New options " + JSON.stringify(projectOptions), true);
+        (0, logger_impl_1.serverLogger)("New options " + JSON.stringify(projectOptions), true);
         project.setProjectOptions(projectOptions);
         project.finishGraph();
     }

@@ -1,6 +1,8 @@
 "use strict";
 exports.__esModule = true;
-exports.FileKind = exports.ESLintResponse = void 0;
+exports.FileKind = exports.ESLintResponse = exports.FixErrors = exports.GetErrors = void 0;
+exports.GetErrors = "GetErrors";
+exports.FixErrors = "FixErrors";
 var ESLintResponse = /** @class */ (function () {
     function ESLintResponse(request_seq, command) {
         this.request_seq = request_seq;

@@ -3,29 +3,32 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 exports.__esModule = true;
+exports.instantiateSession1x = exports.extendSessionClass1x = void 0;
 var ts15impl_1 = require("./ts15impl");
 var util_1 = require("../../util");
 var logger_impl_1 = require("../../logger-impl");
 var ts_project_service_1x_1 = require("./ts-project-service-1x");
 function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder, projectEmittedWithAllFiles) {
     var projectErrors = new util_1.DiagnosticsContainer();
-    var isVersionTypeScript15 = util_1.isTypeScript15(ts_impl);
-    var isVersionTypeScript16 = util_1.isTypeScript16(ts_impl);
-    var isVersionTypeScript17 = util_1.isTypeScript17(ts_impl);
+    var isVersionTypeScript15 = (0, util_1.isTypeScript15)(ts_impl);
+    var isVersionTypeScript16 = (0, util_1.isTypeScript16)(ts_impl);
+    var isVersionTypeScript17 = (0, util_1.isTypeScript17)(ts_impl);
     if (isVersionTypeScript15) {
-        ts15impl_1.setGetFileNames(ts_impl.server.Project);
+        (0, ts15impl_1.setGetFileNames)(ts_impl.server.Project);
     }
-    ts_project_service_1x_1.extendProjectService1x(TypeScriptProjectService, ts_impl, host, projectEmittedWithAllFiles, projectErrors, isVersionTypeScript15, isVersionTypeScript16, isVersionTypeScript17, defaultOptionsHolder);
+    (0, ts_project_service_1x_1.extendProjectService1x)(TypeScriptProjectService, ts_impl, host, projectEmittedWithAllFiles, projectErrors, isVersionTypeScript15, isVersionTypeScript16, isVersionTypeScript17, defaultOptionsHolder);
     var Session1x = /** @class */ (function (_super) {
         __extends(Session1x, _super);
         function Session1x(byteLength, hrtime, logger) {
@@ -72,7 +75,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
         };
         Session1x.prototype.onMessage = function (message) {
             if (isVersionTypeScript15) {
-                if (!ts15impl_1.onMessage15(this, message)) {
+                if (!(0, ts15impl_1.onMessage15)(this, message)) {
                     _super.prototype.onMessage.call(this, message);
                 }
                 return;
@@ -92,7 +95,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
                 else if (TypeScriptCommandNames.ReloadProjects == command) {
                     projectEmittedWithAllFiles.reset();
                     if (isVersionTypeScript15)
-                        return ts15impl_1.reload15(this, ts_impl);
+                        return (0, ts15impl_1.reload15)(this, ts_impl);
                     var requestWithConfigArgs = request.arguments;
                     if (requestWithConfigArgs.projectFileName) {
                         var configFileName = ts_impl.normalizePath(requestWithConfigArgs.projectFileName);
@@ -114,7 +117,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
                 }
                 else if (TypeScriptCommandNames.Close == command) {
                     if (isVersionTypeScript15) {
-                        ts15impl_1.close15(this, request);
+                        (0, ts15impl_1.close15)(this, request);
                         return util_1.doneRequest;
                     }
                     _super.prototype.executeCommand.call(this, request);
@@ -154,7 +157,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
             }
             finally {
                 var processingTime = Date.now() - startTime;
-                logger_impl_1.serverLogger("Message " + request.seq + " '" + command + "' server time, mills: " + processingTime, true);
+                (0, logger_impl_1.serverLogger)("Message " + request.seq + " '" + command + "' server time, mills: " + processingTime, true);
             }
         };
         Session1x.prototype.closeClientFileEx = function (normalizedFileName) {
@@ -178,7 +181,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
             }
             else {
                 if (isVersionTypeScript15)
-                    return ts15impl_1.openClientFileConfig15(projectService, fileName, fileContent, ts_impl);
+                    return (0, ts15impl_1.openClientFileConfig15)(projectService, fileName, fileContent, ts_impl);
                 this.projectService.openOrUpdateConfiguredProjectForFile(fileName);
             }
             var info = this.projectService.openFile(fileName, /*openedByClient*/ true, fileContent);
@@ -194,12 +197,12 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
                 if (scriptInfo != null) {
                     scriptInfo.svc.reload(content);
                     if (logger_impl_1.isLogEnabled) {
-                        logger_impl_1.serverLogger("Update file reload content from text " + file);
+                        (0, logger_impl_1.serverLogger)("Update file reload content from text " + file);
                     }
                 }
                 else {
                     if (logger_impl_1.isLogEnabled) {
-                        logger_impl_1.serverLogger("Update file scriptInfo is null " + file);
+                        (0, logger_impl_1.serverLogger)("Update file scriptInfo is null " + file);
                     }
                     this.openClientFileEx({
                         file: fileName,
@@ -210,7 +213,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
             }
             else {
                 if (logger_impl_1.isLogEnabled) {
-                    logger_impl_1.serverLogger("Update file cannot find project for " + file);
+                    (0, logger_impl_1.serverLogger)("Update file cannot find project for " + file);
                 }
                 this.openClientFileEx({
                     file: fileName,
@@ -242,7 +245,7 @@ function extendSessionClass1x(TypeScriptSession, TypeScriptProjectService, TypeS
             else {
                 if (isVersionTypeScript15)
                     return {
-                        project: ts15impl_1.openProjectByConfig(this.projectService, normalizedRequestedFile, ts_impl),
+                        project: (0, ts15impl_1.openProjectByConfig)(this.projectService, normalizedRequestedFile, ts_impl),
                         wasOpened: false
                     };
                 project = this.projectService.findConfiguredProjectByConfigFile(normalizedRequestedFile);

@@ -3,23 +3,26 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 exports.__esModule = true;
+exports.instantiateSession21 = exports.extendSessionClass21 = void 0;
 var util_1 = require("../../util");
 var logger_impl_1 = require("../../logger-impl");
 var ts_project_service_21_1 = require("./ts-project-service-21");
 function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder, projectEmittedWithAllFiles) {
-    ts_project_service_21_1.extendProjectService21(TypeScriptProjectService, ts_impl, host);
+    (0, ts_project_service_21_1.extendProjectService21)(TypeScriptProjectService, ts_impl, host);
     var version = ts_impl.version;
-    var tsVersion = util_1.parseNumbersInVersion(version);
+    var tsVersion = (0, util_1.parseNumbersInVersion)(version);
     var Session21 = /** @class */ (function (_super) {
         __extends(Session21, _super);
         function Session21() {
@@ -60,13 +63,13 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
                 return result;
             }
             catch (err) {
-                logger_impl_1.serverLogger("Error appending global project errors " + err.message, true);
+                (0, logger_impl_1.serverLogger)("Error appending global project errors " + err.message, true);
             }
             return result;
         };
         Session21.prototype.beforeFirstMessage = function () {
             if (defaultOptionsHolder.options != null) {
-                util_1.updateInferredProjectSettings(ts_impl, defaultOptionsHolder, this.projectService);
+                (0, util_1.updateInferredProjectSettings)(ts_impl, defaultOptionsHolder, this.projectService);
             }
             _super.prototype.beforeFirstMessage.call(this);
         };
@@ -74,7 +77,7 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
             //todo lsHost is a private field
             var host = project.lsHost;
             if (!host) {
-                logger_impl_1.serverLogger("API was changed Project#lsHost is not found", true);
+                (0, logger_impl_1.serverLogger)("API was changed Project#lsHost is not found", true);
                 return;
             }
             if (host && ts_impl.getNewLineCharacter) {
@@ -103,11 +106,11 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
                     var project_1 = externalProjects_1[_i];
                     //close old projects
                     var projectName = this.getProjectName(project_1);
-                    logger_impl_1.serverLogger("Close external project " + projectName, true);
+                    (0, logger_impl_1.serverLogger)("Close external project " + projectName, true);
                     projectService.closeExternalProject(projectName);
                 }
                 if (wasOpened) {
-                    logger_impl_1.serverLogger("Close the opened file", true);
+                    (0, logger_impl_1.serverLogger)("Close the opened file", true);
                     this.closeClientFileEx(requestedFile);
                 }
             }
@@ -147,15 +150,15 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
                     projectService.closeClientFile(normalizedRequestedFile);
                     var externalProject = projectService.findProject(configFileNameForExternalProject);
                     if (externalProject != null) {
-                        logger_impl_1.serverLogger("External Project was created for compiling", true);
+                        (0, logger_impl_1.serverLogger)("External Project was created for compiling", true);
                         return { project: externalProject, wasOpened: false };
                     }
                     else {
-                        logger_impl_1.serverLogger("Error while creating External Project for compiling", true);
+                        (0, logger_impl_1.serverLogger)("Error while creating External Project for compiling", true);
                     }
                 }
                 else {
-                    logger_impl_1.serverLogger("File was opened for compiling", true);
+                    (0, logger_impl_1.serverLogger)("File was opened for compiling", true);
                     return { project: project, wasOpened: true };
                 }
             }
@@ -165,7 +168,7 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
                 if (configProject) {
                     return { project: configProject, wasOpened: false };
                 }
-                logger_impl_1.serverLogger("External project was created for compiling project", true);
+                (0, logger_impl_1.serverLogger)("External project was created for compiling project", true);
                 projectService.openExternalProject({
                     projectFileName: normalizedRequestedFile,
                     rootFiles: [{ fileName: normalizedRequestedFile }],
@@ -173,11 +176,11 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
                 });
                 var externalProject = projectService.findProject(normalizedRequestedFile);
                 if (externalProject != null) {
-                    logger_impl_1.serverLogger("External Project(2) was created for compiling", true);
+                    (0, logger_impl_1.serverLogger)("External Project(2) was created for compiling", true);
                     return { project: externalProject };
                 }
                 else {
-                    logger_impl_1.serverLogger("Error while creating External Project(2) for compiling", true);
+                    (0, logger_impl_1.serverLogger)("Error while creating External Project(2) for compiling", true);
                 }
             }
             return { project: null };
@@ -186,7 +189,7 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
             //todo review performance
             var scriptInfo = this.getProjectService().getScriptInfo(fileName);
             if (!scriptInfo) {
-                logger_impl_1.serverLogger("ERROR! Cannot find script info for file " + fileName, true);
+                (0, logger_impl_1.serverLogger)("ERROR! Cannot find script info for file " + fileName, true);
                 return undefined;
             }
             return scriptInfo.positionToLineOffset(position);
@@ -250,7 +253,7 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
                     return { response: { infos: projectDiagnosticsForFileEx }, responseRequired: true };
                 }
                 else if ("geterrForProject" == command) {
-                    var version221AndHigher = util_1.isVersionMoreOrEqual(tsVersion, 2, 2, 1);
+                    var version221AndHigher = (0, util_1.isVersionMoreOrEqual)(tsVersion, 2, 2, 1);
                     if (!version221AndHigher) {
                         return this.processOldProjectErrors(request);
                     }
@@ -267,7 +270,7 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
             }
             finally {
                 var processingTime = Date.now() - startTime;
-                logger_impl_1.serverLogger("Message " + request.seq + " '" + command + "' server time, mills: " + processingTime, true);
+                (0, logger_impl_1.serverLogger)("Message " + request.seq + " '" + command + "' server time, mills: " + processingTime, true);
             }
         };
         Session21.prototype.getProjectForFileEx = function (fileName, projectFile) {
@@ -344,7 +347,7 @@ function extendSessionClass21(TypeScriptSession, TypeScriptProjectService, TypeS
             //todo review performance
             var scriptInfo = this.getProjectService().getScriptInfo(fileName);
             if (!scriptInfo) {
-                logger_impl_1.serverLogger("ERROR! Cannot find script info for file " + fileName, true);
+                (0, logger_impl_1.serverLogger)("ERROR! Cannot find script info for file " + fileName, true);
                 return undefined;
             }
             return scriptInfo.lineOffsetToPosition(line, offset);
@@ -458,11 +461,13 @@ function instantiateSession21(ts_impl, logger, SessionClassImpl, defaultOptionsH
     };
     var useSingleInferredProject = defaultOptionsHolder.isUseSingleInferredProject();
     var version = ts_impl.version;
-    var tsVersion = util_1.parseNumbersInVersion(version);
+    var tsVersion = (0, util_1.parseNumbersInVersion)(version);
     var session;
-    if (util_1.isVersionMoreOrEqual(tsVersion, 2, 3, 1)) {
-        var pluginProbeLocations = (_a = (defaultOptionsHolder.pluginState.pluginProbeLocations || [])).concat.apply(_a, parseStringArrayArg(defaultOptionsHolder, "--pluginProbeLocations"));
-        var globalPlugins = (_b = (defaultOptionsHolder.pluginState.globalPlugins || [])).concat.apply(_b, parseStringArrayArg(defaultOptionsHolder, "--globalPlugins"));
+    if ((0, util_1.isVersionMoreOrEqual)(tsVersion, 2, 3, 1)) {
+        var pluginProbeLocations = (_a = (defaultOptionsHolder.pluginState.pluginProbeLocations || []))
+            .concat.apply(_a, parseStringArrayArg(defaultOptionsHolder, "--pluginProbeLocations"));
+        var globalPlugins = (_b = (defaultOptionsHolder.pluginState.globalPlugins || []))
+            .concat.apply(_b, parseStringArrayArg(defaultOptionsHolder, "--globalPlugins"));
         var options = {
             host: host,
             cancellationToken: cancellationToken,

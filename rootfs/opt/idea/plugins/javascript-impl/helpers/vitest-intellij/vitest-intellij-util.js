@@ -37,6 +37,9 @@ function finishTestNode(testTask, testNode) {
       testNode.setPrintExpectedAndActualValues(shouldPrintExpectedAndActualValues(failureMessage, failureExpectedStr, failureActualStr));
     }
   }
+  if ((outcome === Tree.TestOutcome.FAILED || outcome === Tree.TestOutcome.ERROR) && process.env.JB_VITEST_LOG_TEST_FAILURE_DETAILS) {
+    testNode.addStdOut('[intellij] "' + testNode.name + '" failure details: ' + stringifier.stringify(result));
+  }
   if (!failureMessage && isTodo(testTask)) {
     failureMessage = `Todo '${testTask.name}'`;
   }

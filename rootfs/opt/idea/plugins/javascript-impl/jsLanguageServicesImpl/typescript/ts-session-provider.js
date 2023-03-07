@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.createSessionClass = exports.instantiateSession = void 0;
 var compile_info_holder_1 = require("./session/compile-info-holder");
 var util_1 = require("./util");
 var ts_session_1x_1 = require("./session/old/ts-session-1x");
@@ -10,30 +11,30 @@ function instantiateSession(ts_impl, logger, defaultOptionsHolder, sessionClass)
     var host = ts_impl.sys;
     var session;
     if (use1x(ts_impl.version)) {
-        return ts_session_1x_1.instantiateSession1x(sessionClass, logger);
+        return (0, ts_session_1x_1.instantiateSession1x)(sessionClass, logger);
     }
     else {
-        return ts_session_21_1.instantiateSession21(ts_impl, logger, sessionClass, defaultOptionsHolder, host);
+        return (0, ts_session_21_1.instantiateSession21)(ts_impl, logger, sessionClass, defaultOptionsHolder, host);
     }
 }
 exports.instantiateSession = instantiateSession;
 function createSessionClass(ts_impl, defaultOptionsHolder) {
-    var defaultSessionClass = ts_common_session_1x_21_1.createCommon_1x_21_SessionClass(ts_impl, defaultOptionsHolder);
+    var defaultSessionClass = (0, ts_common_session_1x_21_1.createCommon_1x_21_SessionClass)(ts_impl, defaultOptionsHolder);
     var TypeScriptProjectService = ts_impl.server.ProjectService;
     var TypeScriptCommandNames = ts_impl.server.CommandNames;
-    util_1.initCommandNames(TypeScriptCommandNames);
+    (0, util_1.initCommandNames)(TypeScriptCommandNames);
     var version = ts_impl.version;
-    var versionNumbers = util_1.parseNumbersInVersion(version);
+    var versionNumbers = (0, util_1.parseNumbersInVersion)(version);
     var host = ts_impl.sys;
-    if (util_1.isVersionMoreOrEqual(versionNumbers, 2, 4, 0)) {
-        return ts_session_latest_1.createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder);
+    if ((0, util_1.isVersionMoreOrEqual)(versionNumbers, 2, 4, 0)) {
+        return (0, ts_session_latest_1.createSessionLatestClass)(TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder);
     }
     else if (use1x(version)) {
-        var sessionClass = ts_session_1x_1.extendSessionClass1x(defaultSessionClass, TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder, compile_info_holder_1.projectEmittedWithAllFiles);
+        var sessionClass = (0, ts_session_1x_1.extendSessionClass1x)(defaultSessionClass, TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder, compile_info_holder_1.projectEmittedWithAllFiles);
         return sessionClass;
     }
     else {
-        var sessionClass = ts_session_21_1.extendSessionClass21(defaultSessionClass, TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder, compile_info_holder_1.projectEmittedWithAllFiles);
+        var sessionClass = (0, ts_session_21_1.extendSessionClass21)(defaultSessionClass, TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder, compile_info_holder_1.projectEmittedWithAllFiles);
         return sessionClass;
     }
 }

@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.serverLogger = exports.createLoggerFromEnv = exports.LoggerImpl = exports.isLogEnabled = void 0;
 var fs = require("fs");
 exports.isLogEnabled = process.env["TSS_LOG"];
 var LoggerImpl = /** @class */ (function () {
@@ -85,7 +86,7 @@ var LoggerImpl = /** @class */ (function () {
             fs.writeSync(this.fd, buf, 0, buf.length, null);
         }
         else if (type == "Err") {
-            console.error(s);
+            serverLogger(s, true);
         }
     };
     return LoggerImpl;

@@ -3,23 +3,26 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 exports.__esModule = true;
+exports.createSessionLatestClass = void 0;
 var ts_project_service_21_1 = require("./session/old/ts-project-service-21");
 var util_1 = require("./util");
 var logger_impl_1 = require("./logger-impl");
 var compile_info_holder_1 = require("./session/compile-info-holder");
 function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNames, host, ts_impl, defaultOptionsHolder) {
-    ts_project_service_21_1.extendProjectService21(TypeScriptProjectService, ts_impl, host);
-    var DefaultSessionClass = util_1.getDefaultSessionClass(ts_impl, host, defaultOptionsHolder);
+    (0, ts_project_service_21_1.extendProjectService21)(TypeScriptProjectService, ts_impl, host);
+    var DefaultSessionClass = (0, util_1.getDefaultSessionClass)(ts_impl, host, defaultOptionsHolder);
     var SessionLatest = /** @class */ (function (_super) {
         __extends(SessionLatest, _super);
         function SessionLatest() {
@@ -77,42 +80,42 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
         };
         SessionLatest.prototype.beforeFirstMessage = function () {
             if (defaultOptionsHolder.options != null) {
-                util_1.updateInferredProjectSettings(ts_impl, defaultOptionsHolder, this.projectService);
+                (0, util_1.updateInferredProjectSettings)(ts_impl, defaultOptionsHolder, this.projectService);
             }
             _super.prototype.beforeFirstMessage.call(this);
         };
         SessionLatest.prototype.logError = function (err, cmd) {
             _super.prototype.logError.call(this, err, cmd);
             if (logger_impl_1.isLogEnabled) {
-                logger_impl_1.serverLogger("Internal error:" + err + "\n " + err.stack);
+                (0, logger_impl_1.serverLogger)("Internal error:" + err + "\n " + err.stack);
             }
         };
         SessionLatest.prototype.getProjectsInfoIDE = function () {
             var _this = this;
-            logger_impl_1.serverLogger("Getting project information");
+            (0, logger_impl_1.serverLogger)("Getting project information");
             var infos = [];
             var configuredProjects = this.projectService.configuredProjects;
             if (Array.isArray(configuredProjects)) {
                 for (var _i = 0, configuredProjects_1 = configuredProjects; _i < configuredProjects_1.length; _i++) {
                     var configuredProject = configuredProjects_1[_i];
-                    logger_impl_1.serverLogger("Process " + configuredProject.getProjectName());
+                    (0, logger_impl_1.serverLogger)("Process " + configuredProject.getProjectName());
                     this.addProjectInfo(configuredProject, infos);
                 }
             }
             else {
                 configuredProjects.forEach(function (configuredProject, key) {
-                    logger_impl_1.serverLogger("Process " + configuredProject.getProjectName());
+                    (0, logger_impl_1.serverLogger)("Process " + configuredProject.getProjectName());
                     _this.addProjectInfo(configuredProject, infos);
                 });
             }
             for (var _a = 0, _b = this.projectService.inferredProjects; _a < _b.length; _a++) {
                 var inferredProject = _b[_a];
-                logger_impl_1.serverLogger("Process " + inferredProject.getProjectName());
+                (0, logger_impl_1.serverLogger)("Process " + inferredProject.getProjectName());
                 this.addProjectInfo(inferredProject, infos);
             }
             for (var _c = 0, _d = this.projectService.externalProjects; _c < _d.length; _c++) {
                 var externalProject = _d[_c];
-                logger_impl_1.serverLogger("Process " + externalProject.getProjectName());
+                (0, logger_impl_1.serverLogger)("Process " + externalProject.getProjectName());
                 this.addProjectInfo(externalProject, infos);
             }
             return { responseRequired: true, response: infos };
@@ -120,7 +123,7 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
         SessionLatest.prototype.addProjectInfo = function (project, infos) {
             var name = project.getProjectName();
             var fileNames = project.getFileNames(false);
-            logger_impl_1.serverLogger("Project " + project.getProjectName() + " files count: " + fileNames.length);
+            (0, logger_impl_1.serverLogger)("Project " + project.getProjectName() + " files count: " + fileNames.length);
             var regularFileInfos = fileNames.map(function (el) {
                 try {
                     var info = project.getScriptInfo(el);
@@ -185,19 +188,19 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
                 try {
                     if (scriptInfo) {
                         if (!scriptInfo.isScriptOpen()) {
-                            logger_impl_1.serverLogger("Compile: Reload file content " + file);
+                            (0, logger_impl_1.serverLogger)("Compile: Reload file content " + file);
                             scriptInfo.reloadFromFile();
                             this.projectService.reloadProjects();
                         }
                     }
                     else {
-                        logger_impl_1.serverLogger("Compile: Cannot find  script info for: " + file);
+                        (0, logger_impl_1.serverLogger)("Compile: Cannot find  script info for: " + file);
                     }
                 }
                 catch (e) {
                     if (logger_impl_1.isLogEnabled)
                         throw e;
-                    logger_impl_1.serverLogger("Compile: Cannot reload content: " + e.message + ", stack " + e.stack, true);
+                    (0, logger_impl_1.serverLogger)("Compile: Cannot reload content: " + e.message + ", stack " + e.stack, true);
                 }
             }
             var oldNewLine = host.newLine;
@@ -211,7 +214,7 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
                 newLineOwner.newLine = newValue;
             }
             else {
-                logger_impl_1.serverLogger("Compile: ERROR API was changed cannot find ts.getNewLineCharacter", true);
+                (0, logger_impl_1.serverLogger)("Compile: ERROR API was changed cannot find ts.getNewLineCharacter", true);
             }
             var program = languageService.getProgram();
             var useOutFile = !!compilerOptions.outFile || !!compilerOptions.out;
@@ -226,7 +229,7 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
                 postProcess: function () {
                     newLineOwner.newLine = oldNewLine;
                     if (findInfo.wasOpened) {
-                        logger_impl_1.serverLogger("Close client file " + file);
+                        (0, logger_impl_1.serverLogger)("Close client file " + file);
                         _this.projectService.closeClientFile(file);
                     }
                 },
@@ -250,7 +253,7 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
                 },
                 getSourceFiles: function () {
                     return program.getSourceFiles();
-                },
+                }
             };
         };
         SessionLatest.prototype.getCompilerOptionsEx = function (project) {
@@ -260,7 +263,7 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
         };
         SessionLatest.prototype.getDiagnosticsForFile = function (file, configFilePath) {
             if (logger_impl_1.isLogEnabled) {
-                logger_impl_1.serverLogger("Get diagnostics for " + file);
+                (0, logger_impl_1.serverLogger)("Get diagnostics for " + file);
             }
             var fileArgs = {
                 file: file,
@@ -322,11 +325,11 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
                 });
                 var externalProject = this.getProjectForConfigPath(normalizedPath);
                 if (externalProject != null) {
-                    logger_impl_1.serverLogger("External Project(2) was created for compiling", true);
+                    (0, logger_impl_1.serverLogger)("External Project(2) was created for compiling", true);
                     return { project: externalProject };
                 }
                 else {
-                    logger_impl_1.serverLogger("Error while creating External Project(2) for compiling", true);
+                    (0, logger_impl_1.serverLogger)("Error while creating External Project(2) for compiling", true);
                 }
             }
             else {
@@ -341,7 +344,7 @@ function createSessionLatestClass(TypeScriptProjectService, TypeScriptCommandNam
                     //no project
                 }
                 var openClientFile = this.projectService.openClientFileWithNormalizedPath(normalizedPath);
-                logger_impl_1.serverLogger("Open client file: " + openClientFile);
+                (0, logger_impl_1.serverLogger)("Open client file: " + openClientFile);
                 try {
                     var project = this.getProjectForFilePath(normalizedPath);
                     if (project) {

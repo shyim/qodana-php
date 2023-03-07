@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.createPollingWatchedFileSet = void 0;
 var fs = require("fs");
 //copy ts-server implementation
 function createPollingWatchedFileSet(ts, sys, interval, chunkSize) {

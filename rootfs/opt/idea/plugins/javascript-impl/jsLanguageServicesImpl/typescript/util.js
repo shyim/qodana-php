@@ -3,16 +3,19 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 exports.__esModule = true;
+exports.getDefaultSessionClass = exports.isFunctionKind = exports.isVersionMoreOrEqual = exports.parseNumbersInVersion = exports.extendEx = exports.copyPropertiesInto = exports.setDefaultOptions = exports.updateInferredProjectSettings = exports.DiagnosticsContainer = exports.doneRequest = exports.isTypeScript20 = exports.isTypeScript17 = exports.isTypeScript16 = exports.isTypeScript15 = exports.DETAILED_MAX_TIME = exports.DETAILED_COMPLETION_COUNT = exports.initCommandNames = void 0;
 var logger_impl_1 = require("./logger-impl");
 var compile_info_holder_1 = require("./session/compile-info-holder");
 function initCommandNames(TypeScriptCommandNames) {
@@ -77,7 +80,7 @@ function updateInferredProjectSettings(ts_impl, defaultOptionsHolder, projectSer
         setDefaultOptions(serviceDefaults, defaultOptionsHolder, projectService);
     }, ts_impl);
     if (defaultOptionsHolder.configFileName && defaultOptionsHolder.isOpenConfigProject()) {
-        logger_impl_1.serverLogger("Opening external project for config " + defaultOptionsHolder.configFileName, true);
+        (0, logger_impl_1.serverLogger)("Opening external project for config " + defaultOptionsHolder.configFileName, true);
         projectService.openExternalProject({
             projectFileName: defaultOptionsHolder.configFileName,
             rootFiles: [{ fileName: defaultOptionsHolder.configFileName }],
@@ -165,16 +168,16 @@ function getDefaultSessionClass(ts_impl, host, defaultOptionsHolder) {
         }
         DefaultSessionExtension.prototype.onMessage = function (message) {
             if (!this._hasFirstMessage) {
-                logger_impl_1.serverLogger("TypeScript service version: " + ts_impl.version, true);
+                (0, logger_impl_1.serverLogger)("TypeScript service version: " + ts_impl.version, true);
                 this.beforeFirstMessage();
                 if (defaultOptionsHolder.options) {
                     if (defaultOptionsHolder.configFileName) {
-                        logger_impl_1.serverLogger("Loaded default config: " + defaultOptionsHolder.configFileName);
+                        (0, logger_impl_1.serverLogger)("Loaded default config: " + defaultOptionsHolder.configFileName);
                     }
-                    logger_impl_1.serverLogger("Default service options: " + JSON.stringify(defaultOptionsHolder.options), true);
+                    (0, logger_impl_1.serverLogger)("Default service options: " + JSON.stringify(defaultOptionsHolder.options), true);
                 }
                 else {
-                    logger_impl_1.serverLogger("Use Single Inferred Project: " + defaultOptionsHolder.isUseSingleInferredProject(), true);
+                    (0, logger_impl_1.serverLogger)("Use Single Inferred Project: " + defaultOptionsHolder.isUseSingleInferredProject(), true);
                 }
                 this._hasFirstMessage = true;
             }
@@ -195,11 +198,11 @@ function getDefaultSessionClass(ts_impl, host, defaultOptionsHolder) {
                 catch (e) {
                     if (logger_impl_1.isLogEnabled)
                         throw e;
-                    logger_impl_1.serverLogger("Error while process write file " + e.stack, true);
+                    (0, logger_impl_1.serverLogger)("Error while process write file " + e.stack, true);
                 }
                 if (logger_impl_1.isLogEnabled) {
-                    logger_impl_1.serverLogger("Compile write file: " + fileName, true);
-                    logger_impl_1.serverLogger("Compile write file (normalized): " + normalizedName);
+                    (0, logger_impl_1.serverLogger)("Compile write file: " + fileName, true);
+                    (0, logger_impl_1.serverLogger)("Compile write file (normalized): " + normalizedName);
                 }
                 outFiles.push(normalizedName);
                 return realWriteFile(normalizedName, data, writeByteOrderMark, onError, sourceFiles);
@@ -210,7 +213,7 @@ function getDefaultSessionClass(ts_impl, host, defaultOptionsHolder) {
         };
         DefaultSessionExtension.prototype.compileFileEx = function (req) {
             if (!req.file && !req.projectFileName) {
-                logger_impl_1.serverLogger("Compile: Empty compile request", true);
+                (0, logger_impl_1.serverLogger)("Compile: Empty compile request", true);
                 return exports.doneRequest;
             }
             var compileInfo = this.getCompileInfo(req);
@@ -218,12 +221,12 @@ function getDefaultSessionClass(ts_impl, host, defaultOptionsHolder) {
                 var isIncludeErrors = req.includeErrors;
                 if (!compileInfo.project || !compileInfo.isCompilingRequired) {
                     if (!compileInfo.isCompilingRequired) {
-                        logger_impl_1.serverLogger("Compile: skip compileOnSave = false", true);
+                        (0, logger_impl_1.serverLogger)("Compile: skip compileOnSave = false", true);
                     }
                     if (!compileInfo.project) {
                         if (logger_impl_1.isLogEnabled)
                             throw new Error("cannot find project");
-                        logger_impl_1.serverLogger("Compile: can't find project: shouldn't be happened", true);
+                        (0, logger_impl_1.serverLogger)("Compile: can't find project: shouldn't be happened", true);
                     }
                     return exports.doneRequest;
                 }
@@ -262,7 +265,7 @@ function getDefaultSessionClass(ts_impl, host, defaultOptionsHolder) {
                     }
                 }
                 else {
-                    logger_impl_1.serverLogger("Compile: No files to update. Source files count: " + rawSourceFiles.length);
+                    (0, logger_impl_1.serverLogger)("Compile: No files to update. Source files count: " + rawSourceFiles.length);
                 }
                 if (includeErrorsAndProcessedFiles_1) {
                     diagnostics_1 = diagnostics_1.concat(compileInfo.getDiagnostics());

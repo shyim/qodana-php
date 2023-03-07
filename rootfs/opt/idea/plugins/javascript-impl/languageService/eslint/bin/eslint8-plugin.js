@@ -58,10 +58,22 @@ var ESLint8Plugin = /** @class */ (function () {
         this.ESLint = (0, eslint_common_1.requireInContext)(eslintPackagePath, state.packageJsonPath).ESLint;
         try {
             var apiJsPath = (0, eslint_common_1.requireResolveInContext)(eslintPackagePath, state.packageJsonPath);
-            this.libOptions = (0, eslint_common_1.requireInContext)("../lib/options" /* path relative to eslint/lib/api.js */, apiJsPath);
+            try {
+                this.libOptions = (0, eslint_common_1.requireInContext)("../lib/options" /* path relative to eslint/lib/api.js */, apiJsPath);
+            }
+            catch (e) {
+                this.libOptions = null;
+            }
+            try {
+                this.FlatESLint = (0, eslint_common_1.requireInContext)("../lib/unsupported-api", apiJsPath).FlatESLint;
+            }
+            catch (e) {
+                this.FlatESLint = null;
+            }
         }
         catch (e) {
             this.libOptions = null;
+            this.FlatESLint = null;
         }
     }
     ESLint8Plugin.prototype.onMessage = function (p, writer) {
@@ -75,14 +87,14 @@ var ESLint8Plugin = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 7, , 8]);
-                        if (!(request.command === ESLint8Plugin.GetErrors)) return [3 /*break*/, 3];
+                        if (!(request.command === eslint_api_1.GetErrors)) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.getErrors(request.arguments)];
                     case 2:
                         lintResults = _a.sent();
                         response.body = { results: this.filterSourceIfNeeded(lintResults) };
                         return [3 /*break*/, 6];
                     case 3:
-                        if (!(request.command === ESLint8Plugin.FixErrors)) return [3 /*break*/, 5];
+                        if (!(request.command === eslint_api_1.FixErrors)) return [3 /*break*/, 5];
                         return [4 /*yield*/, this.fixErrors(request.arguments)];
                     case 4:
                         lintResults = _a.sent();
@@ -131,18 +143,21 @@ var ESLint8Plugin = /** @class */ (function () {
     ESLint8Plugin.prototype.invokeESLint = function (requestArguments, additionalOptions) {
         if (additionalOptions === void 0) { additionalOptions = {}; }
         return __awaiter(this, void 0, void 0, function () {
-            var CLIOptions, parsedCommandLineOptions, options, eslint, config, plugins;
+            var usingFlatConfig, CLIOptions, parsedCommandLineOptions, options, eslint, config, plugins;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        usingFlatConfig = requestArguments.flatConfig && this.FlatESLint instanceof Function;
                         CLIOptions = this.libOptions instanceof Function
-                            ? this.libOptions(false) // eslint 8.23+
+                            ? this.libOptions(usingFlatConfig) // eslint 8.23+
                             : this.libOptions;
                         parsedCommandLineOptions = CLIOptions != null && CLIOptions.parse instanceof Function
-                            ? translateOptions(CLIOptions.parse(requestArguments.extraOptions || ""))
+                            ? translateOptions(CLIOptions.parse(requestArguments.extraOptions || ""), usingFlatConfig ? "flat" : "eslintrc")
                             : {};
                         options = __assign(__assign({}, parsedCommandLineOptions), additionalOptions);
-                        options.ignorePath = requestArguments.ignoreFilePath;
+                        if (!usingFlatConfig) {
+                            options.ignorePath = requestArguments.ignoreFilePath;
+                        }
                         if (requestArguments.configPath != null) {
                             options.overrideConfigFile = requestArguments.configPath;
                         }
@@ -154,7 +169,7 @@ var ESLint8Plugin = /** @class */ (function () {
                                 options.rulePaths.push(this.additionalRulesDirectory);
                             }
                         }
-                        eslint = new this.ESLint(options);
+                        eslint = usingFlatConfig ? new this.FlatESLint(options) : new this.ESLint(options);
                         if (!(requestArguments.fileKind === eslint_api_1.FileKind.html)) return [3 /*break*/, 2];
                         return [4 /*yield*/, eslint.calculateConfigForFile(requestArguments.fileName)];
                     case 1:
@@ -174,32 +189,71 @@ var ESLint8Plugin = /** @class */ (function () {
             });
         });
     };
-    ESLint8Plugin.GetErrors = "GetErrors";
-    ESLint8Plugin.FixErrors = "FixErrors";
     return ESLint8Plugin;
 }());
 exports.ESLint8Plugin = ESLint8Plugin;
-// See https://github.com/eslint/eslint/blob/f1b7499a5162d3be918328ce496eb80692353a5a/lib/cli.js#L62
+// See https://github.com/eslint/eslint/blob/740b20826fadc5322ea5547c1ba41793944e571d/lib/cli.js#L69
 /**
- * Translates the CLI options into the options expected by the CLIEngine.
+ * Translates the CLI options into the options expected by the ESLint constructor.
  * @param {ParsedCLIOptions} cliOptions The CLI options to translate.
- * @returns {ESLintOptions} The options object for the CLIEngine.
+ * @param {"flat"|"eslintrc"} [configType="eslintrc"] The format of the
+ *      config to generate.
+ * @returns {Promise<ESLintOptions>} The options object for the ESLint constructor.
  * @private
  */
-function translateOptions(_a) {
-    var cache = _a.cache, cacheFile = _a.cacheFile, cacheLocation = _a.cacheLocation, cacheStrategy = _a.cacheStrategy, config = _a.config, env = _a.env, errorOnUnmatchedPattern = _a.errorOnUnmatchedPattern, eslintrc = _a.eslintrc, ext = _a.ext, fix = _a.fix, fixDryRun = _a.fixDryRun, fixType = _a.fixType, global = _a.global, ignore = _a.ignore, ignorePath = _a.ignorePath, ignorePattern = _a.ignorePattern, inlineConfig = _a.inlineConfig, parser = _a.parser, parserOptions = _a.parserOptions, plugin = _a.plugin, quiet = _a.quiet, reportUnusedDisableDirectives = _a.reportUnusedDisableDirectives, resolvePluginsRelativeTo = _a.resolvePluginsRelativeTo, rule = _a.rule, rulesdir = _a.rulesdir;
-    return {
-        allowInlineConfig: inlineConfig,
-        cache: cache,
-        cacheLocation: cacheLocation || cacheFile,
-        cacheStrategy: cacheStrategy,
-        errorOnUnmatchedPattern: errorOnUnmatchedPattern,
-        extensions: ext,
-        // fix: (fix || fixDryRun) && (quiet ? quietFixPredicate : true),
-        fixTypes: fixType,
-        ignore: ignore,
-        ignorePath: ignorePath,
-        overrideConfig: {
+/*async*/ function translateOptions(_a, configType) {
+    var cache = _a.cache, cacheFile = _a.cacheFile, cacheLocation = _a.cacheLocation, cacheStrategy = _a.cacheStrategy, config = _a.config, configLookup = _a.configLookup, env = _a.env, errorOnUnmatchedPattern = _a.errorOnUnmatchedPattern, eslintrc = _a.eslintrc, ext = _a.ext, fix = _a.fix, fixDryRun = _a.fixDryRun, fixType = _a.fixType, global = _a.global, ignore = _a.ignore, ignorePath = _a.ignorePath, ignorePattern = _a.ignorePattern, inlineConfig = _a.inlineConfig, parser = _a.parser, parserOptions = _a.parserOptions, plugin = _a.plugin, quiet = _a.quiet, reportUnusedDisableDirectives = _a.reportUnusedDisableDirectives, resolvePluginsRelativeTo = _a.resolvePluginsRelativeTo, rule = _a.rule, rulesdir = _a.rulesdir;
+    var overrideConfig, overrideConfigFile;
+    /*
+    const importer = new ModuleImporter();
+    */
+    if (configType === "flat") {
+        overrideConfigFile = (typeof config === "string") ? config : !configLookup;
+        if (overrideConfigFile === false) {
+            overrideConfigFile = void 0;
+        }
+        var globals = {};
+        if (global) {
+            globals = global.reduce(function (obj, name) {
+                if (name.endsWith(":true")) {
+                    obj[name.slice(0, -5)] = "writable";
+                }
+                else {
+                    obj[name] = "readonly";
+                }
+                return obj;
+            }, globals);
+        }
+        overrideConfig = [{
+                languageOptions: {
+                    globals: globals,
+                    parserOptions: parserOptions || {}
+                },
+                rules: rule ? rule : {}
+            }];
+        /*
+        if (parser) {
+          overrideConfig[0].languageOptions.parser = await importer.import(parser);
+        }
+    
+        if (plugin) {
+          const plugins = {};
+    
+          for (const pluginName of plugin) {
+    
+            const shortName = naming.getShorthandName(pluginName, "eslint-plugin");
+            const longName = naming.normalizePackageName(pluginName, "eslint-plugin");
+    
+            plugins[shortName] = await importer.import(longName);
+          }
+    
+          overrideConfig[0].plugins = plugins;
+        }
+        */
+    }
+    else {
+        overrideConfigFile = config;
+        overrideConfig = {
             env: env && env.reduce(function (obj, name) {
                 obj[name] = true;
                 return obj;
@@ -218,12 +272,33 @@ function translateOptions(_a) {
             parserOptions: parserOptions,
             plugins: plugin,
             rules: rule
-        },
-        overrideConfigFile: config,
-        reportUnusedDisableDirectives: reportUnusedDisableDirectives ? "error" : void 0,
-        resolvePluginsRelativeTo: resolvePluginsRelativeTo,
-        rulePaths: rulesdir,
-        useEslintrc: eslintrc
+        };
+    }
+    var options = {
+        allowInlineConfig: inlineConfig,
+        cache: cache,
+        cacheLocation: cacheLocation || cacheFile,
+        cacheStrategy: cacheStrategy,
+        errorOnUnmatchedPattern: errorOnUnmatchedPattern,
+        /*
+        fix: (fix || fixDryRun) && (quiet ? quietFixPredicate : true),
+        */
+        fixTypes: fixType,
+        ignore: ignore,
+        overrideConfig: overrideConfig,
+        overrideConfigFile: overrideConfigFile,
+        reportUnusedDisableDirectives: reportUnusedDisableDirectives ? "error" : void 0
     };
+    if (configType === "flat") {
+        options.ignorePatterns = ignorePattern;
+    }
+    else {
+        options.resolvePluginsRelativeTo = resolvePluginsRelativeTo;
+        options.rulePaths = rulesdir;
+        options.useEslintrc = eslintrc;
+        options.extensions = ext;
+        options.ignorePath = ignorePath;
+    }
+    return options;
 }
 //# sourceMappingURL=eslint8-plugin.js.map

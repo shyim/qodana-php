@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.DefaultOptionsHolder = void 0;
 var logger_impl_1 = require("./logger-impl");
 var out_path_process_1 = require("./out-path-process");
 var DefaultOptionsHolder = /** @class */ (function () {
@@ -28,7 +29,7 @@ var DefaultOptionsHolder = /** @class */ (function () {
                 this.mainFile = pluginState.mainFilePath;
             }
             if (pluginState.outPath) {
-                this.pathProcessor = out_path_process_1.getPathProcessor(ts_impl, pluginState);
+                this.pathProcessor = (0, out_path_process_1.getPathProcessor)(ts_impl, pluginState);
             }
         }
     }
@@ -83,7 +84,7 @@ var DefaultOptionsHolder = /** @class */ (function () {
         catch (err) {
             if (logger_impl_1.isLogEnabled)
                 throw err;
-            logger_impl_1.serverLogger("Error refreshing tsconfig.json " + this.configFileName + ' ' + err.message + '\n' + err.stack, true);
+            (0, logger_impl_1.serverLogger)("Error refreshing tsconfig.json " + this.configFileName + ' ' + err.message + '\n' + err.stack, true);
         }
     };
     DefaultOptionsHolder.prototype.getConfigOptionsForFile = function (ts_impl, configName) {
@@ -107,7 +108,7 @@ var DefaultOptionsHolder = /** @class */ (function () {
             }
         }
         catch (err) {
-            logger_impl_1.serverLogger("Error parsing tsconfig.json " + configName + ' ' + err.message + '\n' + err.stack, true);
+            (0, logger_impl_1.serverLogger)("Error parsing tsconfig.json " + configName + ' ' + err.message + '\n' + err.stack, true);
         }
         return null;
     };

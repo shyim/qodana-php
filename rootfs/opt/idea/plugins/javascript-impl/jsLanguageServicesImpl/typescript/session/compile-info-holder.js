@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.projectEmittedWithAllFiles = exports.CompileInfoHolder = exports.HolderContainer = void 0;
 var crypto = require('crypto');
 var HolderContainer = /** @class */ (function () {
     function HolderContainer() {

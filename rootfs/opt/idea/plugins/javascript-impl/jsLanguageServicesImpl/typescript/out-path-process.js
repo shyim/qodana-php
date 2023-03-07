@@ -4,6 +4,7 @@
  * Expands macros for 'output path' field
  */
 exports.__esModule = true;
+exports.getPathProcessor = void 0;
 var fileName = '$FileName$';
 var fileDir = '$FileDir$';
 var fileDirName = '$FileDirName$';

@@ -3,25 +3,28 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 exports.__esModule = true;
+exports.createCommon_1x_21_SessionClass = void 0;
 var util_1 = require("../../util");
 var logger_impl_1 = require("../../logger-impl");
 function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, defaultOptionsHolder) {
     var TypeScriptCommandNames = ts_impl.server.CommandNames;
-    util_1.initCommandNames(TypeScriptCommandNames);
+    (0, util_1.initCommandNames)(TypeScriptCommandNames);
     var host = ts_impl.sys;
     var wasFirstMessage = false;
     var version = ts_impl.version;
-    var DefaultSessionClass = util_1.getDefaultSessionClass(ts_impl, host, defaultOptionsHolder);
+    var DefaultSessionClass = (0, util_1.getDefaultSessionClass)(ts_impl, host, defaultOptionsHolder);
     var IDESession = /** @class */ (function (_super) {
         __extends(IDESession, _super);
         function IDESession() {
@@ -37,12 +40,12 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
         };
         IDESession.prototype.logError = function (err, cmd) {
             var typedErr = err;
-            logger_impl_1.serverLogger("Error processing message: " + err.message + " " + typedErr.stack, true);
+            (0, logger_impl_1.serverLogger)("Error processing message: " + err.message + " " + typedErr.stack, true);
             _super.prototype.logError.call(this, err, cmd);
         };
         IDESession.prototype.logMessage = function (text, force) {
             if (force === void 0) { force = false; }
-            logger_impl_1.serverLogger(text, force);
+            (0, logger_impl_1.serverLogger)(text, force);
         };
         IDESession.prototype.getChangeSeq = function () {
             var anyThis = this;
@@ -50,7 +53,7 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
             if (typeof superClassSeq !== "undefined") {
                 return superClassSeq;
             }
-            logger_impl_1.serverLogger("WARN: Used own sequence implementation (can be slow)", true);
+            (0, logger_impl_1.serverLogger)("WARN: Used own sequence implementation (can be slow)", true);
             return this._mySeq;
         };
         IDESession.prototype.updateProjectStructureEx = function () {
@@ -61,7 +64,7 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
                 if (matchSeq(_this.getChangeSeq())) {
                     var startTime = Date.now();
                     _this.refreshStructureEx();
-                    logger_impl_1.serverLogger("Update project structure scheduler time, mills: " + (Date.now() - startTime), true);
+                    (0, logger_impl_1.serverLogger)("Update project structure scheduler time, mills: " + (Date.now() - startTime), true);
                 }
             }, 1500);
         };
@@ -118,7 +121,7 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
                 },
                 getSourceFiles: function () {
                     return program.getSourceFiles();
-                },
+                }
             };
         };
         IDESession.prototype.ensureFileContentIsActual = function (requestedFile) {
@@ -126,13 +129,13 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
             try {
                 var scriptInfo = this.getScriptInfo(this.projectService, requestedFile);
                 if (scriptInfo && !scriptInfo.isOpen) {
-                    logger_impl_1.serverLogger("Reload content for compiling " + requestedFile);
+                    (0, logger_impl_1.serverLogger)("Reload content for compiling " + requestedFile);
                     this.reloadFileFromDisk(scriptInfo);
                     this.refreshStructureEx();
                 }
             }
             catch (err) {
-                logger_impl_1.serverLogger("ERROR update file content " +
+                (0, logger_impl_1.serverLogger)("ERROR update file content " +
                     requestedFile +
                     " " +
                     err.message +
@@ -167,7 +170,7 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
                     var file = ts_impl.normalizePath(fileName);
                     this.closeClientFileEx(file);
                     if (logger_impl_1.isLogEnabled) {
-                        logger_impl_1.serverLogger("Update file from disk (by 'filesToReloadContentFromDisk') " + file);
+                        (0, logger_impl_1.serverLogger)("Update file from disk (by 'filesToReloadContentFromDisk') " + file);
                     }
                     updated = true;
                 }
@@ -190,12 +193,12 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
                 type: request.type
             });
             if (logger_impl_1.isLogEnabled) {
-                logger_impl_1.serverLogger("Completion service implementation time, mills: " + (this.getTime() - startDate));
+                (0, logger_impl_1.serverLogger)("Completion service implementation time, mills: " + (this.getTime() - startDate));
             }
             var response = result.response;
             var ideCompletions = this.getDetailedCompletionEx(args, response);
             if (logger_impl_1.isLogEnabled) {
-                logger_impl_1.serverLogger("Completion with detailed items time, mills: " + (this.getTime() - startDate));
+                (0, logger_impl_1.serverLogger)("Completion with detailed items time, mills: " + (this.getTime() - startDate));
             }
             return {
                 response: ideCompletions,
@@ -244,7 +247,7 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
             var file = ts_impl.normalizePath(req.file);
             var project = this.getProjectForFileEx(file);
             if (!project) {
-                logger_impl_1.serverLogger("Can't find project: shouldn't be happened", true);
+                (0, logger_impl_1.serverLogger)("Can't find project: shouldn't be happened", true);
                 return entries;
             }
             var position = this.lineOffsetToPosition(project, file, req.line, req.offset);
@@ -258,7 +261,7 @@ function createCommon_1x_21_SessionClass(ts_impl /*must be typeof ts */, default
                     //no time
                     count = util_1.DETAILED_COMPLETION_COUNT + 1;
                 }
-                if (!util_1.isFunctionKind(entry.kind) || count++ > util_1.DETAILED_COMPLETION_COUNT) {
+                if (!(0, util_1.isFunctionKind)(entry.kind) || count++ > util_1.DETAILED_COMPLETION_COUNT) {
                     accumulator.push(entry);
                 }
                 else {

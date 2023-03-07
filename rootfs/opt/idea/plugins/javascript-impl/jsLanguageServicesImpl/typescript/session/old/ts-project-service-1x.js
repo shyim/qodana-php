@@ -1,9 +1,10 @@
 "use strict";
 exports.__esModule = true;
+exports.copyOptionsWithResolvedFilesWithoutExtensions = exports.extendProjectService1x = void 0;
 var logger_impl_1 = require("../../logger-impl");
 var util_1 = require("../../util");
 function extendProjectService1x(TypeScriptProjectService, ts_impl, host, projectEmittedWithAllFiles, projectErrors, isVersionTypeScript15, isVersionTypeScript16, isVersionTypeScript17, commonDefaultOptions) {
-    util_1.extendEx(TypeScriptProjectService, "fileDeletedInFilesystem", function (oldFunction, args) {
+    (0, util_1.extendEx)(TypeScriptProjectService, "fileDeletedInFilesystem", function (oldFunction, args) {
         var info = args[0];
         var filePath = ts_impl.normalizePath(info.fileName);
         var emittedWithAllFiles = projectEmittedWithAllFiles.value;
@@ -17,7 +18,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
         }
         oldFunction.apply(this, args);
     });
-    util_1.extendEx(TypeScriptProjectService, "createInferredProject", function (oldFunction, args) {
+    (0, util_1.extendEx)(TypeScriptProjectService, "createInferredProject", function (oldFunction, args) {
         var project = oldFunction.apply(this, args);
         if (commonDefaultOptions.options != null && project && project.compilerService) {
             var commonSettings = project.compilerService.settings;
@@ -34,7 +35,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
         }
         return project;
     });
-    util_1.extendEx(TypeScriptProjectService, "watchedProjectConfigFileChanged", function (oldFunction, args) {
+    (0, util_1.extendEx)(TypeScriptProjectService, "watchedProjectConfigFileChanged", function (oldFunction, args) {
         var project = args[0];
         var projectFilename = project.projectFilename;
         cleanCachedData(projectFilename);
@@ -42,14 +43,14 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
             return;
         }
         oldFunction.apply(this, args);
-        logger_impl_1.serverLogger("Watcher — project changed " + (projectFilename ? projectFilename : "unnamed"), true);
+        (0, logger_impl_1.serverLogger)("Watcher — project changed " + (projectFilename ? projectFilename : "unnamed"), true);
     });
-    util_1.extendEx(TypeScriptProjectService, "configFileToProjectOptions", function (oldFunction, args) {
+    (0, util_1.extendEx)(TypeScriptProjectService, "configFileToProjectOptions", function (oldFunction, args) {
         var configFilename = args[0];
         var normalizedConfigName = ts_impl.normalizePath(configFilename);
         if (normalizedConfigName) {
             if (logger_impl_1.isLogEnabled) {
-                logger_impl_1.serverLogger("Parse config normalized path " + normalizedConfigName);
+                (0, logger_impl_1.serverLogger)("Parse config normalized path " + normalizedConfigName);
             }
             var value = projectErrors.value;
             value[normalizedConfigName] = null;
@@ -62,7 +63,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
         var configFileToProjectOptions = configFileToProjectOptionsExt(configFilename);
         configFileToProjectOptions = copyOptionsWithResolvedFilesWithoutExtensions(host, configFileToProjectOptions, this, ts_impl);
         if (logger_impl_1.isLogEnabled) {
-            logger_impl_1.serverLogger("Parse config result options: " + JSON.stringify(configFileToProjectOptions));
+            (0, logger_impl_1.serverLogger)("Parse config result options: " + JSON.stringify(configFileToProjectOptions));
         }
         setProjectLevelError(configFileToProjectOptions, normalizedConfigName);
         return configFileToProjectOptions;
@@ -72,7 +73,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
      */
     function configFileToProjectOptionsExt(configFilename) {
         if (logger_impl_1.isLogEnabled) {
-            logger_impl_1.serverLogger("Parse config " + configFilename);
+            (0, logger_impl_1.serverLogger)("Parse config " + configFilename);
         }
         configFilename = ts_impl.normalizePath(configFilename);
         // file references will be relative to dirPath (or absolute)
@@ -81,7 +82,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
         var rawConfig = ts_impl.parseConfigFileTextToJson(configFilename, contents);
         if (rawConfig.error) {
             if (logger_impl_1.isLogEnabled) {
-                logger_impl_1.serverLogger("Parse config error " + JSON.stringify(rawConfig.error));
+                (0, logger_impl_1.serverLogger)("Parse config error " + JSON.stringify(rawConfig.error));
             }
             return { succeeded: false, errors: [rawConfig.error] };
         }
@@ -105,7 +106,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
     function createProjectOptionsForCommandLine(parsedCommandLine, parsedJsonConfig) {
         var projectOptions = {
             files: parsedCommandLine.fileNames,
-            compilerOptions: parsedCommandLine.options,
+            compilerOptions: parsedCommandLine.options
         };
         if (parsedCommandLine.wildcardDirectories) {
             projectOptions.wildcardDirectories = parsedCommandLine.wildcardDirectories;
@@ -145,7 +146,7 @@ function extendProjectService1x(TypeScriptProjectService, ts_impl, host, project
             value[normalizedConfigName] = [{
                     text: errorMessage,
                     end: undefined,
-                    start: undefined,
+                    start: undefined
                 }];
         }
     }

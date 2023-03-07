@@ -111,6 +111,9 @@ function initAndStartListening(params) {
         }
     });
     rl.on("close", function () {
+        // If IDE doesn't have enough time to terminate process properly
+        // (due to being killed or just not to slow down the whole IDE termination stage),
+        // the process should take precautions and terminate itself.
         exitProcess();
     });
     sendCommand("ready");

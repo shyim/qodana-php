@@ -1,10 +1,8 @@
 import {CLIEngine, Linter} from "eslint";
-import {EslintPluginState, ESLintRequest, ESLintResponse, FileKind, RequestArguments} from "./eslint-api"
+import {EslintPluginState, ESLintRequest, ESLintResponse, FileKind, RequestArguments, FixErrors, GetErrors} from "./eslint-api"
 import {containsString, normalizePath, requireInContext, requireResolveInContext, toUnixPathSeparators} from "./eslint-common"
 
 export class ESLintPlugin implements LanguagePlugin {
-    private static readonly GetErrors: string = "GetErrors";
-    private static readonly FixErrors: string = "FixErrors";
     private readonly includeSourceText: boolean | null;
     private readonly additionalRulesDirectory?: string;
     private readonly standardLinter: any;
@@ -34,9 +32,9 @@ export class ESLintPlugin implements LanguagePlugin {
         const request: ESLintRequest = JSON.parse(p);
         let response: ESLintResponse = new ESLintResponse(request.seq, request.command);
         try {
-            if (request.command === ESLintPlugin.GetErrors) {
+            if (request.command === GetErrors) {
                 response.body = this.filterSourceIfNeeded(this.getErrors(request.arguments));
-            } else if (request.command === ESLintPlugin.FixErrors) {
+            } else if (request.command === FixErrors) {
                 response.body = this.filterSourceIfNeeded(this.fixErrors(request.arguments))
             } else {
                 response.error = `Unknown command: ${request.command}`

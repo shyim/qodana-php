@@ -1,20 +1,21 @@
 "use strict";
 exports.__esModule = true;
+exports.extendProjectService21 = void 0;
 var util_1 = require("../../util");
 var logger_impl_1 = require("../../logger-impl");
 function extendProjectService21(TypeScriptProjectService, ts_impl, host) {
     overrideParseJsonConfigFileContent(ts_impl);
     overrideParseJsonSourceFileConfigFileContent(ts_impl);
     overrideGetBaseConfigFileName(ts_impl);
-    util_1.extendEx(TypeScriptProjectService, "convertConfigFileContentToProjectOptions", function (oldFunction, args) {
+    (0, util_1.extendEx)(TypeScriptProjectService, "convertConfigFileContentToProjectOptions", function (oldFunction, args) {
         if (!oldFunction) {
-            logger_impl_1.serverLogger("ERROR: method convertConfigFileContentToProjectOptions doesn't exist", true);
+            (0, logger_impl_1.serverLogger)("ERROR: method convertConfigFileContentToProjectOptions doesn't exist", true);
             return;
         }
         var options = oldFunction.apply(this, args);
         if (options) {
             if (options.projectOptions) {
-                logger_impl_1.serverLogger("Updated compileOnSave");
+                (0, logger_impl_1.serverLogger)("Updated compileOnSave");
                 //By default ts service consider compileOnSave === undefined -> compileOnSave == false
                 //we need override this behaviour
                 if (options.projectOptions.compileOnSave == null) {
@@ -37,7 +38,7 @@ function overrideParseJsonConfigFileContent(ts_impl) {
     ts_impl.parseJsonConfigFileContent = function () {
         var jsonOption = arguments.length > 0 ? arguments[0] : null;
         if (jsonOption != null && !ts_impl.hasProperty(jsonOption, ts_impl.compileOnSaveCommandLineOption.name)) {
-            logger_impl_1.serverLogger("No compileOnSave — return true");
+            (0, logger_impl_1.serverLogger)("No compileOnSave — return true");
             jsonOption.compileOnSave = true;
         }
         return parseJsonConfigFileContentOld.apply(this, arguments);
@@ -68,7 +69,7 @@ function overrideGetBaseConfigFileName(ts_impl) {
         return false;
     }
     ts_impl.server.getBaseConfigFileName = function () {
-        logger_impl_1.serverLogger("Called override", true);
+        (0, logger_impl_1.serverLogger)("Called override", true);
         var result = getBaseConfigFileNameOld.apply(this, arguments);
         if (result)
             return result;

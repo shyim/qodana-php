@@ -3,21 +3,33 @@
  * Entry point for the TypeScript plugin
  */
 exports.__esModule = true;
+exports.factory = exports.TypeScriptLanguagePluginFactory = exports.TypeScriptLanguagePlugin = void 0;
 var service_loader_1 = require("./service-loader");
 var logger_impl_1 = require("./logger-impl");
 var ts_session_provider_1 = require("./ts-session-provider");
 var ts_default_options_1 = require("./ts-default-options");
 var ide_watcher_1 = require("./ide-watcher");
+var util_1 = require("./util");
 var TypeScriptLanguagePlugin = /** @class */ (function () {
     function TypeScriptLanguagePlugin(state) {
-        var serviceInfo = service_loader_1.getService(state);
+        var serviceInfo = (0, service_loader_1.getService)(state);
         var ts_impl = serviceInfo.ts;
         var serverFilePath = serviceInfo.serverFilePath;
-        logger_impl_1.serverLogger("Service context " + serviceInfo.serverFilePath, true);
-        var loggerImpl = logger_impl_1.createLoggerFromEnv(ts_impl);
-        this.overrideSysDefaults(ts_impl, state, serverFilePath);
-        var defaultOptionsHolder = this.getDefaultCommandLineOptions(state, ts_impl);
-        this._session = this.getSession(ts_impl, loggerImpl, defaultOptionsHolder);
+        var version = ts_impl.version;
+        var versionNumbers = (0, util_1.parseNumbersInVersion)(version);
+        if ((0, util_1.isVersionMoreOrEqual)(versionNumbers, 5)) {
+            var serviceInfo_1 = (0, service_loader_1.getService)(state, true);
+            ts_impl = serviceInfo_1.ts;
+            TypeScriptLanguagePlugin.setLocale(this.getDefaultCommandLineOptions(state, ts_impl), ts_impl);
+        }
+        else {
+            (0, logger_impl_1.serverLogger)("Service context " + serviceInfo.serverFilePath, true);
+            this.overrideSysDefaults(ts_impl, state, serverFilePath);
+            var defaultOptionsHolder = this.getDefaultCommandLineOptions(state, ts_impl);
+            TypeScriptLanguagePlugin.setLocale(defaultOptionsHolder, ts_impl);
+            var loggerImpl = (0, logger_impl_1.createLoggerFromEnv)(ts_impl);
+            this._session = this.getSession(ts_impl, loggerImpl, defaultOptionsHolder);
+        }
         this.readyMessage = { version: ts_impl.version };
     }
     /**
@@ -38,6 +50,12 @@ var TypeScriptLanguagePlugin = /** @class */ (function () {
         }
         var isUseSingleInferredProject = state.isUseSingleInferredProject;
         return new ts_default_options_1.DefaultOptionsHolder(commonDefaultOptions, ts_impl, state);
+    };
+    TypeScriptLanguagePlugin.setLocale = function (defaultOptionsHolder, ts_impl) {
+        var _a;
+        if (((_a = defaultOptionsHolder.options) === null || _a === void 0 ? void 0 : _a.locale) && typeof ts_impl.validateLocaleAndSetLanguage === "function") {
+            ts_impl.validateLocaleAndSetLanguage(defaultOptionsHolder.options.locale, ts_impl.sys);
+        }
     };
     TypeScriptLanguagePlugin.prototype.overrideSysDefaults = function (ts_impl, state, serverFile) {
         var pending = [];
@@ -71,7 +89,7 @@ var TypeScriptLanguagePlugin = /** @class */ (function () {
         ts_impl.sys.getExecutingFilePath = function () {
             return serverFile;
         };
-        var pollingWatchedFileSet = ide_watcher_1.createPollingWatchedFileSet(ts_impl, ts_impl.sys);
+        var pollingWatchedFileSet = (0, ide_watcher_1.createPollingWatchedFileSet)(ts_impl, ts_impl.sys);
         ts_impl.sys.watchFile = function (fileName, callback) {
             var watchedFile = pollingWatchedFileSet.addFile(fileName, callback);
             return {
@@ -88,7 +106,7 @@ var TypeScriptLanguagePlugin = /** @class */ (function () {
                     path = initialDir + "/" + moduleName;
                 }
                 if (logger_impl_1.isLogEnabled) {
-                    logger_impl_1.serverLogger("Resolving plugin with path " + path);
+                    (0, logger_impl_1.serverLogger)("Resolving plugin with path " + path);
                 }
                 return {
                     module: require(path),
@@ -96,7 +114,7 @@ var TypeScriptLanguagePlugin = /** @class */ (function () {
                 };
             }
             catch (error) {
-                logger_impl_1.serverLogger("Error while resolving plugin " + error);
+                (0, logger_impl_1.serverLogger)("Error while resolving plugin " + error);
                 return { module: undefined, error: error };
             }
         };
@@ -110,13 +128,15 @@ var TypeScriptLanguagePlugin = /** @class */ (function () {
         return this.instantiateSession(ts_impl, loggerImpl, defaultOptionsHolder, sessionClass);
     };
     TypeScriptLanguagePlugin.prototype.instantiateSession = function (ts_impl, loggerImpl, defaultOptionsHolder, sessionClass) {
-        return ts_session_provider_1.instantiateSession(ts_impl, loggerImpl, defaultOptionsHolder, sessionClass);
+        return (0, ts_session_provider_1.instantiateSession)(ts_impl, loggerImpl, defaultOptionsHolder, sessionClass);
     };
     TypeScriptLanguagePlugin.prototype.createSessionClass = function (ts_impl, defaultOptionsHolder) {
-        return ts_session_provider_1.createSessionClass(ts_impl, defaultOptionsHolder);
+        return (0, ts_session_provider_1.createSessionClass)(ts_impl, defaultOptionsHolder);
     };
     TypeScriptLanguagePlugin.prototype.onMessage = function (p, writer) {
-        this._session.onMessage(p);
+        if (this._session) {
+            this._session.onMessage(p);
+        }
     };
     return TypeScriptLanguagePlugin;
 }());

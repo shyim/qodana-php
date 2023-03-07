@@ -37,10 +37,10 @@ var ESLintPlugin = /** @class */ (function () {
         var request = JSON.parse(p);
         var response = new eslint_api_1.ESLintResponse(request.seq, request.command);
         try {
-            if (request.command === ESLintPlugin.GetErrors) {
+            if (request.command === eslint_api_1.GetErrors) {
                 response.body = this.filterSourceIfNeeded(this.getErrors(request.arguments));
             }
-            else if (request.command === ESLintPlugin.FixErrors) {
+            else if (request.command === eslint_api_1.FixErrors) {
                 response.body = this.filterSourceIfNeeded(this.fixErrors(request.arguments));
             }
             else {
@@ -102,8 +102,6 @@ var ESLintPlugin = /** @class */ (function () {
         }
         return cliEngine.executeOnText(requestArguments.content, requestArguments.fileName);
     };
-    ESLintPlugin.GetErrors = "GetErrors";
-    ESLintPlugin.FixErrors = "FixErrors";
     return ESLintPlugin;
 }());
 exports.ESLintPlugin = ESLintPlugin;

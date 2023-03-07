@@ -1,18 +1,24 @@
 "use strict";
 exports.__esModule = true;
+exports.getService = void 0;
 var logger_impl_1 = require("./logger-impl");
 var toReplace = "ioSession.listen()";
 var replacement = "//ioSession.listen()";
+function getDefaultServiceName(tsServer) {
+    return tsServer ? "tsserver" : "tsserverlibrary";
+}
 /**
  * Provide service for old & new integration (ts-complier-host-impl)
  */
-function getService(state) {
+function getService(state, tsServer) {
+    if (tsServer === void 0) { tsServer = false; }
     var serviceFolderPath = state.serverFolderPath;
     var serverFolderPath = serviceFolderPath;
     if (serverFolderPath == null) {
         throw new Error('Service file is empty');
     }
     var fs = require('fs');
+    var defaultServiceName = getDefaultServiceName(tsServer);
     if (state.packageJson != null) {
         try {
             if ((process.versions).pnp != null) {
@@ -20,8 +26,8 @@ function getService(state) {
                     state.packageJson :
                     state.packageJson.substr(0, state.packageJson.length - "/package.json".length);
                 var newRequire = createRequire(newRequirePath);
-                var path = serverFolderPath + "/lib/tsserverlibrary";
-                logger_impl_1.serverLogger("Yarn require is used " + newRequirePath, true);
+                var path = serverFolderPath + "/lib/" + defaultServiceName;
+                (0, logger_impl_1.serverLogger)("Yarn require is used " + newRequirePath, true);
                 var tsService = newRequire(path);
                 if (tsService != null && tsService.version != null) {
                     var resolvePath = newRequire.resolve(path);
@@ -43,7 +49,7 @@ function getService(state) {
         if (lastChar != '/' && lastChar != '\\') {
             serviceFolderPath_1 = serviceFolderPath_1 + "/";
         }
-        var resolvePath = serviceFolderPath_1 + "tsserverlibrary.js";
+        var resolvePath = serviceFolderPath_1 + defaultServiceName + ".js";
         var tsService = require(resolvePath);
         if (tsService != null) {
             //the main issue with the solution that we don't "real" start place
@@ -53,10 +59,10 @@ function getService(state) {
                 var nodeModulesCandidate = tsService.getDirectoryPath(tsService.getDirectoryPath(serviceFolderPath_1));
                 //possibly "real" typescript is used 
                 if (fs_1.existsSync(nodeModulesCandidate + "/typescript/lib/lib.d.ts")) {
-                    resolvePath = nodeModulesCandidate + "/typescript/lib/tsserverlibrary.js";
+                    resolvePath = nodeModulesCandidate + "/typescript/lib/" + defaultServiceName + ".js";
                 }
             }
-            logger_impl_1.serverLogger("Require is used " + serviceFolderPath_1, true);
+            (0, logger_impl_1.serverLogger)("Require is used " + serviceFolderPath_1, true);
             return {
                 ts: tsService,
                 serverFilePath: resolvePath
@@ -64,9 +70,9 @@ function getService(state) {
         }
     }
     catch (e) {
-        //skip, try the next code 
+        //skip, try to load the services directly
     }
-    var data = getFilePathIfExists(fs, serverFolderPath);
+    var data = getFilePathIfExists(fs, serverFolderPath, tsServer);
     if (!data) {
         throw new Error('Cannot find tsserverlibrary.js or tsserver.js file');
     }
@@ -100,11 +106,11 @@ function createRequire(contextPath) {
     throw Error('Function module.createRequire is unavailable in Node.js ' + process.version +
         ', Node.js >= 12.2.0 is required');
 }
-function getFilePathIfExists(fs, serverFolderPath) {
-    {
+function getFilePathIfExists(fs, serverFolderPath, tsServer) {
+    if (!tsServer) {
         var pathToServicesFile = serverFolderPath + "tsserverlibrary.js";
         if (fs.existsSync(pathToServicesFile)) {
-            logger_impl_1.serverLogger("File content load for tsserverlibrary is used", true);
+            (0, logger_impl_1.serverLogger)("File content load for tsserverlibrary is used", true);
             return {
                 data: fs.readFileSync(pathToServicesFile, 'utf-8'),
                 path: pathToServicesFile
@@ -114,10 +120,10 @@ function getFilePathIfExists(fs, serverFolderPath) {
     {
         var pathToServerFile = serverFolderPath + "tsserver.js";
         if (fs.existsSync(pathToServerFile)) {
-            logger_impl_1.serverLogger("File content load for tsserver with override is used", true);
+            (0, logger_impl_1.serverLogger)("File content load for tsserver with override is used", true);
             var fileData = fs.readFileSync(pathToServerFile, 'utf-8');
             return {
-                data: fileData.replace(toReplace, replacement),
+                data: tsServer ? fileData : fileData.replace(toReplace, replacement),
                 path: pathToServerFile
             };
         }

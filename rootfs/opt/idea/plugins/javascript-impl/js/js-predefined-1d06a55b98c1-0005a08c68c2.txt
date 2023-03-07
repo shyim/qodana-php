@@ -1,0 +1,1 @@
+--additional-os=windows --additional-os=linux --additional-os=mac --generate-binary-reproducible-maps=true js-predefined-all

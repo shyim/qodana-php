@@ -75,7 +75,6 @@ IntellijReporter.prototype.onCollected = vitestIntellijUtil.safeFn((files) => {
   startTestingIfNeeded();
   buildTreeAndProcessTests(files, (testTask, testNode, filePath) => {
     getOrCreateStat(filePath).collectedTestCount++;
-    testIdToTestNodeMap[testTask.id] = testNode;
   });
 });
 
@@ -98,16 +97,22 @@ function buildTreeAndProcessTests(files, callback) {
           }
           currentParentNode = childSuiteNode;
         }
-        let testNode = currentParentNode.findChildNodeByName(testTask.name);
-        if (testNode == null || vitestIntellijUtil.isSuiteNode(testNode)) {
-          const testLocationPath = vitestIntellijUtil.getLocationPath(currentParentNode, testTask.name, fileNode, filePath);
-          testNode = currentParentNode.addTestChild(testTask.name, 'test', testLocationPath);
-          testNode.start();
-        }
+        const testNode = getOrCreateTestNode(currentParentNode, testTask, fileNode, filePath)
         callback(testTask, testNode, filePath);
       })
     }
   }
+}
+
+function getOrCreateTestNode(currentParentNode, testTask, fileNode, filePath) {
+  let testNode = testIdToTestNodeMap[testTask.id];
+  if (testNode == null) {
+    const testLocationPath = vitestIntellijUtil.getLocationPath(currentParentNode, testTask.name, fileNode, filePath)
+    testNode = currentParentNode.addTestChild(testTask.name, 'test', testLocationPath)
+    testIdToTestNodeMap[testTask.id] = testNode;
+    testNode.start()
+  }
+  return testNode
 }
 
 function getOrCreateFileNode(filePath) {

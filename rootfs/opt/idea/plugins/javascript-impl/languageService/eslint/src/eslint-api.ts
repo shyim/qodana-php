@@ -1,7 +1,10 @@
+export const GetErrors = "GetErrors";
+export const FixErrors = "FixErrors";
+
 export interface EslintPluginState extends PluginState {
   readonly eslintPackagePath: string;
-  readonly eslintPackageVersion: string;
   readonly standardPackagePath: string;
+  readonly linterPackageVersion: string;
   readonly packageJsonPath?: string;
   readonly additionalRootDirectory?: string;
   readonly includeSourceText: boolean | null;
@@ -45,7 +48,8 @@ export interface RequestArguments {
   readonly configPath: string | null;
   readonly content: string;
   readonly extraOptions: string | null;
-  readonly fileKind: FileKind
+  readonly fileKind: FileKind;
+  readonly flatConfig: boolean;
 }
 
 export class ESLintResponse {

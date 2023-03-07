@@ -1,7 +1,32 @@
-FROM jetbrains/qodana-php:2023.1-eap
+FROM jetbrains/qodana-php:2023.1-eap as qodana-php
+
+FROM debian:11-slim
+
+ENV JAVA_HOME=/opt/idea/jbr \
+    DEVICEID= \
+    QODANA_DOCKER=true \
+    QODANA_CONF=/root/.config/idea \
+    PATH=/opt/idea/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    HOME=/root \
+    LC_ALL=en_US.UTF-8 \
+    QODANA_DIST=/opt/idea \
+    QODANA_DATA=/data
+
+COPY --from=qodana-php /opt/idea /opt/idea
+
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl https://packages.sury.org/php/README.txt | bash && \
+    apt-get install -y php8.2-cli php8.2-mysql php8.2-curl php8.2-gd php8.2-xml php8.2-zip php8.2-opcache php8.2-mbstring php8.2-intl php8.2-imap php8.2-pgsql php8.2-soap && \
+    rm -rf /var/cache/apt /var/lib/apt/ /tmp/* && \
+    update-alternatives --install /usr/bin/java java $JAVA_HOME/bin/java 0 && \
+    update-alternatives --install /usr/bin/javac javac $JAVA_HOME/bin/javac 0 && \
+    update-alternatives --set java $JAVA_HOME/bin/java && \
+    update-alternatives --set javac $JAVA_HOME/bin/javac
 
 COPY rootfs/ /
+COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
-RUN apt-get update && apt-get purge php* -y && apt-get install -y php8.2-cli php8.2-mysql php8.2-curl php8.2-gd php8.2-xml php8.2-zip php8.2-opcache php8.2-mbstring php8.2-intl php8.2-imap php8.2-pgsql php8.2-soap && composer selfupdate
+WORKDIR /data/project
 
 ENTRYPOINT ["/entrypoint.sh"]
