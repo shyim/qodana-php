@@ -22,7 +22,8 @@ RUN apt-get update && \
     update-alternatives --install /usr/bin/java java $JAVA_HOME/bin/java 0 && \
     update-alternatives --install /usr/bin/javac javac $JAVA_HOME/bin/javac 0 && \
     update-alternatives --set java $JAVA_HOME/bin/java && \
-    update-alternatives --set javac $JAVA_HOME/bin/javac
+    update-alternatives --set javac $JAVA_HOME/bin/javac && \
+    mkdir -p /root/.config/idea
 
 COPY rootfs/ /
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
