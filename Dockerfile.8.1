@@ -16,8 +16,9 @@ COPY --from=qodana-php /opt/idea /opt/idea
 
 RUN apt-get update && \
     apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
     curl https://packages.sury.org/php/README.txt | bash && \
-    apt-get install -y php8.1-cli php8.1-mysql php8.1-curl php8.1-gd php8.1-xml php8.1-zip php8.1-opcache php8.1-mbstring php8.1-intl php8.1-imap php8.1-pgsql php8.1-soap && \
+    apt-get install -y nodejs php8.1-cli php8.1-mysql php8.1-curl php8.1-gd php8.1-xml php8.1-zip php8.1-opcache php8.1-mbstring php8.1-intl php8.1-imap php8.1-pgsql php8.1-soap && \
     rm -rf /var/cache/apt /var/lib/apt/ /tmp/* && \
     update-alternatives --install /usr/bin/java java $JAVA_HOME/bin/java 0 && \
     update-alternatives --install /usr/bin/javac javac $JAVA_HOME/bin/javac 0 && \
