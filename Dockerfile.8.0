@@ -18,7 +18,7 @@ RUN apt-get update && \
     apt-get install -y curl && \
     curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     curl https://packages.sury.org/php/README.txt | bash && \
-    apt-get install -y nodejs php8.0-cli php8.0-mysql php8.0-curl php8.0-gd php8.0-xml php8.0-zip php8.0-opcache php8.0-mbstring php8.0-intl php8.0-imap php8.0-pgsql php8.0-soap && \
+    apt-get install -y nodejs php8.0-cli php8.0-mysql php8.0-curl php8.0-gd php8.0-xml php8.0-zip php8.0-opcache php8.0-mbstring php8.0-intl php8.0-imap php8.0-pgsql php8.0-soap php8.0-bcmath && \
     rm -rf /var/cache/apt /var/lib/apt/ /tmp/* && \
     update-alternatives --install /usr/bin/java java $JAVA_HOME/bin/java 0 && \
     update-alternatives --install /usr/bin/javac javac $JAVA_HOME/bin/javac 0 && \
