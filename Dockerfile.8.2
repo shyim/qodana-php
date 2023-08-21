@@ -1,6 +1,6 @@
-FROM jetbrains/qodana-php:2023.1-eap as qodana-php
+FROM jetbrains/qodana-php:2023.2 as qodana-php
 
-FROM debian:11-slim
+FROM bitnami/minideb:bookworm
 
 ENV JAVA_HOME=/opt/idea/jbr \
     DEVICEID= \

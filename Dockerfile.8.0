@@ -1,4 +1,4 @@
-FROM jetbrains/qodana-php:2023.1-eap as qodana-php
+FROM jetbrains/qodana-php:2023.2 as qodana-php
 
 FROM debian:11-slim
 

@@ -4,9 +4,6 @@ This is an customized qodana-php docker image to include the Symfony Plugin and 
 
 ## Changes to original Image
 
-- Added PHPStan plugin to understand phpstan types
-- Added Psalm plugin to understand psalm types
-- Added JavaScript support together with PHP support
 - Added Symfony Plugin
 - Added PHP Annotations Plugin
 - Added PHP Inspections EA Extended
